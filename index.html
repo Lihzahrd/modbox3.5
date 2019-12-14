@@ -59,7 +59,7 @@
 			<font color="#44ff44">ModBox Beta 3.3.0-A_5</font>
 		</h1>
 		<h2>
-			This is a test for splash text.
+			<div id="jummboxPlant"; color:#44ff44"></div>
 		</h2>
 		<p id="introduction">
 			BeepBox is an online tool for sketching and sharing chiptune melodies. ModBox expands the world of BeepBox into a whole new realm! We are on the frontier of exploaration with this beta!
@@ -246,7 +246,28 @@ Instead of loading js beepbox editor interface directly, test for browser suppor
 		}
 
 //]]>
-
+		// Randomize display of header
+		// 1-in-10
+		if ( Math.floor( Math.random() * 10 ) == 0 ) {
+			switch ( Math.floor( Math.random() * 5 ) ) {
+				case 0:
+					document.getElementById("jummboxPlant").innerHTML = "  🍂";
+					break;
+				case 1:
+					document.getElementById("jummboxPlant").innerHTML = "  🌿";
+					break;
+				case 2:
+					document.getElementById("jummboxPlant").innerHTML = "  🌺";
+					break;
+				case 3:
+					document.getElementById("jummboxPlant").innerHTML = "  🍃";
+					break;
+				case 4:
+					document.getElementById("jummboxPlant").style.color = "#e18426";
+					document.getElementById("jummboxPlant").innerHTML = "  🎃";
+					break;
+			}
+		}
 	</script>
 
 </body>
