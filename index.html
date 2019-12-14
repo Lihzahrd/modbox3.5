@@ -246,8 +246,8 @@ Instead of loading js beepbox editor interface directly, test for browser suppor
 //]]>
 		// Randomize display of header
 		// 1-in-10
-		if ( Math.floor( Math.random() * 5 ) == 5 ) {
-			switch ( Math.floor( Math.random() * 5 ) ) {
+		if ( Math.floor( Math.random() * 3 ) == 1 ) {
+			switch ( Math.floor( Math.random() * 3 ) ) {
 				case 0:
 					document.getElementById("jummboxPlant").innerHTML = "  🍂";
 					break;
@@ -259,10 +259,6 @@ Instead of loading js beepbox editor interface directly, test for browser suppor
 					break;
 				case 3:
 					document.getElementById("jummboxPlant").innerHTML = "  🍃";
-					break;
-				case 4:
-					document.getElementById("jummboxPlant").style.color = "#e18426";
-					document.getElementById("jummboxPlant").innerHTML = "  🎃";
 					break;
 			}
 		}
