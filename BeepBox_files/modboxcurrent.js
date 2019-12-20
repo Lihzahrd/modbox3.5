@@ -12460,6 +12460,7 @@ var beepbox;
 			this._advancedInstrumentSettingsLabel = div({ style: "margin: 3px 0; text-align: center;" }, "Advanced Instrument Settings"),
 			this._advancedSongSettingsLabel = div({ style: "margin: 2px; text-align: center;" }, "Advanced Song Settings"),
 	    this._detuneSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: beepbox.Config.detuneRange - 1, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new beepbox.ChangeDetune(this._doc, oldValue, newValue));
+	    <div class="selectRow"><span>Detune: </span><input style="width: 9em; margin: 0px;" type="range" min="0" max="23" step="1"></div>
 				
 			
 			this._customInstrumentSettingsGroup = div({ className: "editor-controls" }, 
