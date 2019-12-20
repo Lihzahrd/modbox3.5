@@ -56,6 +56,7 @@ var beepbox;
     Config.tempoMin = 30;
     Config.tempoMax = 300;
     Config.reverbRange = 4;
+    Config.detuneRange = 10;
     Config.beatsPerBarMin = 3;
     Config.beatsPerBarMax = 16;
     Config.barCountMin = 1;
@@ -2063,6 +2064,11 @@ var beepbox;
                     }
                     this.beatsPerBar = Math.max(beepbox.Config.beatsPerBarMin, Math.min(beepbox.Config.beatsPerBarMax, this.beatsPerBar));
                 }
+		}    					
+                else if (command == 72) {
+                    this.detune = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                    this.detune = Song._clip(0, Config.detuneRange, this.detune);
+                }  
                 else if (command == 103) {
                     this.barCount = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)] + 1;
                     this.barCount = Math.max(beepbox.Config.barCountMin, Math.min(beepbox.Config.barCountMax, this.barCount));
@@ -2672,6 +2678,7 @@ var beepbox;
                 "ticksPerBeat": beepbox.Config.rhythms[this.rhythm].stepsPerBeat,
                 "beatsPerMinute": this.tempo,
                 "reverb": this.reverb,
+		"detune": this.detune,
                 "channels": channelArray,
             };
         }
@@ -2715,6 +2722,9 @@ var beepbox;
             if (jsonObject["reverb"] != undefined) {
                 this.reverb = clamp(0, beepbox.Config.reverbRange, jsonObject["reverb"] | 0);
             }
+	    if (jsonObject["detune'] != undefined) {
+		this.detune = clamp(0, beepbox.Config.detuneRange, jsonObject["detune"] | 0);	   
+	    }
             if (jsonObject["beatsPerBar"] != undefined) {
                 this.beatsPerBar = Math.max(beepbox.Config.beatsPerBarMin, Math.min(beepbox.Config.beatsPerBarMax, jsonObject["beatsPerBar"] | 0));
             }
@@ -12457,6 +12467,7 @@ var beepbox;
             this._instrumentSettingsLabel = div({ style: "margin: 3px 0; text-align: center;" }, "Instrument Settings"),
 			this._advancedInstrumentSettingsLabel = div({ style: "margin: 3px 0; text-align: center;" }, "Advanced Instrument Settings"),
 			this._advancedSongSettingsLabel = div({ style: "margin: 2px; text-align: center;" }, "Advanced Song Settings"),
+	    this._detuneSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: beepbox.Config.detuneRange - 1, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new beepbox.ChangeDetune(this._doc, oldValue, newValue));
 				
 			
 			this._customInstrumentSettingsGroup = div({ className: "editor-controls" }, 
