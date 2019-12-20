@@ -2064,10 +2064,6 @@ var beepbox;
                     }
                     this.beatsPerBar = Math.max(beepbox.Config.beatsPerBarMin, Math.min(beepbox.Config.beatsPerBarMax, this.beatsPerBar));
                 } 					
-                else if (command == 72) {
-                    this.detune = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
-                    this.detune = Song._clip(0, Config.detuneRange, this.detune);
-                }  
                 else if (command == 103) {
                     this.barCount = (base64CharCodeToInt[compressed.charCodeAt(charIndex++)] << 6) + base64CharCodeToInt[compressed.charCodeAt(charIndex++)] + 1;
                     this.barCount = Math.max(beepbox.Config.barCountMin, Math.min(beepbox.Config.barCountMax, this.barCount));
@@ -2721,9 +2717,6 @@ var beepbox;
             if (jsonObject["reverb"] != undefined) {
                 this.reverb = clamp(0, beepbox.Config.reverbRange, jsonObject["reverb"] | 0);
             }
-	    if (jsonObject["detune'] != undefined) {
-		this.detune = clamp(0, beepbox.Config.detuneRange, jsonObject["detune"] | 0);	   
-	    }
             if (jsonObject["beatsPerBar"] != undefined) {
                 this.beatsPerBar = Math.max(beepbox.Config.beatsPerBarMin, Math.min(beepbox.Config.beatsPerBarMax, jsonObject["beatsPerBar"] | 0));
             }
