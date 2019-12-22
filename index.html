@@ -316,7 +316,21 @@ Instead of loading js beepbox editor interface directly, test for browser suppor
 			}
 		}
 	</script>
+		<script type="text/javascript">
 
+
+Event.observe(document.body, 'click', function(event) {
+  if (Event.element(event).tagName == 'A') {
+    staying_in_site = true;
+  }
+});
+
+window.onbeforeunload = popup;
+
+function popup() {
+  return 'I see you are leaving the site';
+}
+		</script>
 </body>
 
 </html>
