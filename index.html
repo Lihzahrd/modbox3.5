@@ -319,17 +319,24 @@ Instead of loading js beepbox editor interface directly, test for browser suppor
 		<script type="text/javascript">
 
 
-Event.observe(document.body, 'click', function(event) {
-  if (Event.element(event).tagName == 'A') {
-    staying_in_site = true;
-  }
+var mouseX = 0;
+var mouseY = 0;
+var popupCounter = 0;
+
+document.addEventListener("mousemove", function(e) {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    document.getElementById("coordinates").innerHTML = "<br />X: " + e.clientX + "px<br />Y: " + e.clientY + "px";
 });
 
-window.onbeforeunload = popup;
-
-function popup() {
-  return 'I see you are leaving the site';
-}
+$(document).mouseleave(function () {
+    if (mouseY < 100) {
+        if (popupCounter < 1) {
+            alert("Please don't close the tab!");
+        }
+        popupCounter ++;
+    }
+});
 		</script>
 </body>
 
