@@ -12363,11 +12363,17 @@ var beepbox;
 				beepbox.SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "-5 -21 26 26" }, 
 				beepbox.SVG.path({ d: "M 2 0 L 2 -16 L 10 -16 L 14 -12 L 14 0 z M 3 -1 L 13 -1 L 13 -11 L 9 -11 L 9 -15 L 3 -15 z", fill: "currentColor" })),
 			);
-			this._songDataButton = div({ className: "generalButton" },
-				button({ style: "width: 100%;", type: "button"}, "Song Data"), 
-				beepbox.SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "-5 -21 26 26" }, 
-				beepbox.SVG.path({ d: "M 0 0 L 16 0 L 16 -13 L 10 -13 L 8 -16 L 0 -16 L 0 -13 z", fill: "currentColor" })),
-			);
+			this.container = div({ className: "prompt", style: "width: 250px;" }, [
+                div({ style: "font-size: 2em" }, [text("Song Data")]),
+				div({ style: "text-align: left;" }, [text('You are on update Modbox 3.3.0-B_1.')]),
+				div({ style: "text-align: left;" }, [text('Your song is ' + _this._doc.synth.totalSeconds + ' seconds long.')]),
+				div({ style: "text-align: left;" }, [text('Your song runs at ' + _this._doc.song.getBeatsPerMinute() + ' beats per minute.')]),
+				div({ style: "text-align: left;" }, [text('There are currently ' + _this._doc.song.getChannelUnusedCount() + ' unused channels in your song out of 16.')]),
+				div({ style: "text-align: left;" }, [text('Your are using the ' + _this._doc.song.getThemeName() + ' theme.')]),
+				div({ style: "text-align: left;" }, [text('Your time signuature is ' + _this._doc.song.getTimeSig())]),
+				div({ style: "text-align: left;" }, [text('Your scale is ' + _this._doc.song.getScaleNKey() + '.')]),
+                this._cancelButton,
+            ]);
 			this._volumeSlider = input({ title: "main volume", style: "width: 5em; flex-grow: 1; margin: 0;", type: "range", min: "0", max: "100", value: "50", step: "1" });
             this._customizeSongMenu = select({ style: "width: 100%;" }, 
 				option({ selected: true, disabled: true, hidden: false }, "Customize Song"), 
