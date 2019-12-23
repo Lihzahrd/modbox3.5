@@ -2055,6 +2055,10 @@ var beepbox;
                     this.reverb = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
                     this.reverb = clamp(0, beepbox.Config.reverbRange, this.reverb);
                 }
+		else if (command == 123) {
+                    this.detune = base64CharCodeToInt[compressed.charCodeAt(charIndex++)];
+                    this.detune = clamp(0, beepbox.Config.detuneRange, this.detune);
+                }
                 else if (command == 97) {
                     if (beforeThree) {
                         this.beatsPerBar = [6, 7, 8, 9, 10][base64CharCodeToInt[compressed.charCodeAt(charIndex++)]];
@@ -2717,6 +2721,9 @@ var beepbox;
             if (jsonObject["reverb"] != undefined) {
                 this.reverb = clamp(0, beepbox.Config.reverbRange, jsonObject["reverb"] | 0);
             }
+	    if (jsonObject["detune"] != undefined) {
+                this.detune = clamp(0, beepbox.Config.detuneRange, jsonObject["detune"] | 0);
+            }
             if (jsonObject["beatsPerBar"] != undefined) {
                 this.beatsPerBar = Math.max(beepbox.Config.beatsPerBarMin, Math.min(beepbox.Config.beatsPerBarMax, jsonObject["beatsPerBar"] | 0));
             }
@@ -2908,7 +2915,7 @@ var beepbox;
     Song._format = "BeepBox";
     Song._oldestVersion = 2;
     Song._latestVersion = 7;
-    Song._base64IntToCharCode = [48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 45, 95];
+    Song._base64IntToCharCode = [48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 45, 95, 123];
     Song._base64CharCodeToInt = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 62, 62, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 0, 0, 0, 0, 0, 0, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 0, 0, 0, 0, 63, 0, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 0, 0, 0, 0, 0];
     beepbox.Song = Song;
     class Tone {
@@ -12459,7 +12466,6 @@ var beepbox;
             this._instrumentSettingsLabel = div({ style: "margin: 3px 0; text-align: center;" }, "Instrument Settings"),
 			this._advancedInstrumentSettingsLabel = div({ style: "margin: 3px 0; text-align: center;" }, "Advanced Instrument Settings"),
 			this._advancedSongSettingsLabel = div({ style: "margin: 2px; text-align: center;" }, "Advanced Song Settings"),
-	    this._reverbSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: beepbox.Config.reverbRange - 1, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new beepbox.ChangeReverb(this._doc, oldValue, newValue));
 	    this._detuneSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: beepbox.Config.detuneRange - 1, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new beepbox.ChangeDetune(this._doc, oldValue, newValue));
 	    
 				
