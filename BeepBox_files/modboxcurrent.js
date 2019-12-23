@@ -12459,6 +12459,7 @@ var beepbox;
             this._instrumentSettingsLabel = div({ style: "margin: 3px 0; text-align: center;" }, "Instrument Settings"),
 			this._advancedInstrumentSettingsLabel = div({ style: "margin: 3px 0; text-align: center;" }, "Advanced Instrument Settings"),
 			this._advancedSongSettingsLabel = div({ style: "margin: 2px; text-align: center;" }, "Advanced Song Settings"),
+	    this._reverbSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: beepbox.Config.reverbRange - 1, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new beepbox.ChangeReverb(this._doc, oldValue, newValue));
 	    this._detuneSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: beepbox.Config.detuneRange - 1, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new beepbox.ChangeDetune(this._doc, oldValue, newValue));
 	    
 				
