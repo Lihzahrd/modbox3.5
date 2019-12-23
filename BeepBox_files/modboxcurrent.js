@@ -12363,7 +12363,6 @@ var beepbox;
 				beepbox.SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "-5 -21 26 26" }, 
 				beepbox.SVG.path({ d: "M 2 0 L 2 -16 L 10 -16 L 14 -12 L 14 0 z M 3 -1 L 13 -1 L 13 -11 L 9 -11 L 9 -15 L 3 -15 z", fill: "currentColor" })),
 			);
-			this.container = div({ className: "prompt", style: "width: 250px;" }, [
                 this._songDataButton = div({ className: "generalButton" },
 				button({ style: "width: 100%;", type: "button"}, "Song Data"), 
 				beepbox.SVG.svg({ style: "flex-shrink: 0; position: absolute; left: 0; top: 50%; margin-top: -1em; pointer-events: none;", width: "2em", height: "2em", viewBox: "-5 -21 26 26" }, 
