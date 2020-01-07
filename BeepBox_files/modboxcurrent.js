@@ -95,7 +95,7 @@ var beepbox;
         { name: "double saw", volume: 0.5, samples: centerWave([0.0, -0.2, -0.4, -0.6, -0.8, -1.0, 1.0, -0.8, -0.6, -0.4, -0.2, 1.0, 0.8, 0.6, 0.4, 0.2]) },
         { name: "double pulse", volume: 0.4, samples: centerWave([1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0]) },
         { name: "spiky", volume: 0.4, samples: centerWave([1.0, -1.0, 1.0, -1.0, 1.0, 0.0]) },
-	{ name: "atari bass", volume: 0.4, samples: centerWave([-1.0, -1.0, 1.0, -1.0, 1.0, 0.2]) },
+	{ name: "atari bass", volume: 0.4, samples: centerWave([-1.0, -1.0, 1.0, -1.0, 1.0, 0.2, 0.5, 0.2]) },
     ]);
     Config.chipNoises = toNameMap([
         { name: "retro", volume: 0.25, basePitch: 69, pitchFilterMult: 1024.0, isSoft: false, samples: null },
@@ -12385,6 +12385,7 @@ var beepbox;
 				beepbox.SVG.path({ d: "M 0 0 L 16 0 L 16 -13 L 10 -13 L 8 -16 L 0 -16 L 0 -13 z", fill: "currentColor" })),
 			);
 			this._volumeSlider = input({ title: "main volume", style: "width: 5em; flex-grow: 1; margin: 0;", type: "range", min: "0", max: "100", value: "50", step: "1" });
+		this._volumeStepper = input({ style: "width: 3em; margin-left: 0.2em; vertical-align: middle;", type: "number", step: "1" });
             this._customizeSongMenu = select({ style: "width: 100%;" }, 
 				option({ selected: true, disabled: true, hidden: false }, "Customize Song"), 
 				option({ value: "forceScale" }, "Force All Notes To Scale"), 
@@ -12521,7 +12522,7 @@ var beepbox;
 			this._editorControls = div({ className: "editor-controls" }, 
 				div({ style: "margin: 0px; text-align: center; color: #999;" }, beepbox.Config.versionDisplayName), 
 				div({ className: "editor-volume-controls", style: "margin-top: 1px;" }, 
-				this._playButton, div(beepbox.SVG.svg({ style: "flex-shrink: 0;", width: "2em", height: "2em", viewBox: "0 0 26 26" }, beepbox.SVG.path({ d: "M 4 16 L 4 10 L 8 10 L 13 5 L 13 21 L 8 16 z M 15 11 L 16 10 A 7.2 7.2 0 0 1 16 16 L 15 15 A 5.8 5.8 0 0 0 15 12 z M 18 8 L 19 7 A 11.5 11.5 0 0 1 19 19 L 18 18 A 10.1 10.1 0 0 0 18 8 z", fill: "#777" })), this._volumeSlider))
+				this._playButton, div(beepbox.SVG.svg({ style: "flex-shrink: 0;", width: "2em", height: "2em", viewBox: "0 0 26 26" }, beepbox.SVG.path({ d: "M 4 16 L 4 10 L 8 10 L 13 5 L 13 21 L 8 16 z M 15 11 L 16 10 A 7.2 7.2 0 0 1 16 16 L 15 15 A 5.8 5.8 0 0 0 15 12 z M 18 8 L 19 7 A 11.5 11.5 0 0 1 19 19 L 18 18 A 10.1 10.1 0 0 0 18 8 z", fill: "#777" })), this._volumeSlider, this._volumeStepper))
 			);
 			this._editorControlsAdvanced = div({ className: "editor-controls-right" }, 
 				div({ style: "margin: 0px; text-align: center; color: #999;" }, "Advanced Settings"), 
@@ -12810,6 +12811,7 @@ var beepbox;
                     patternWidth -= 20;
                 this._patternEditor.container.style.width = String(patternWidth) + "px";
                 this._volumeSlider.value = String(this._doc.volume);
+		this._volumeStepper.value = String(this._doc.volume);
                 if (wasActive && activeElement != null && activeElement.clientWidth == 0) {
                     this._refocusStage();
                 }
@@ -12934,6 +12936,9 @@ var beepbox;
             };
             this._setVolumeSlider = () => {
                 this._doc.setVolume(Number(this._volumeSlider.value));
+            };
+	    this._whenSetVolume = () => {
+                this._doc.record(new beepbox.ChangeVolume(this._doc, -1, parseInt(this._volumeStepper.value) | 0));
             };
             this._whenSetTempo = () => {
                 this._doc.record(new beepbox.ChangeTempo(this._doc, -1, parseInt(this._tempoStepper.value) | 0));
