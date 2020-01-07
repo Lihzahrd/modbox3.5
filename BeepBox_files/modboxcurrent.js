@@ -23,7 +23,7 @@ var beepbox;
 (function (beepbox) {
     class Config {
     }
-    Config.versionDisplayName = "BeepBox 3.0";
+    Config.versionDisplayName = "Modbox 3.5";
     Config.scales = toNameMap([
         { name: "easy :)", flags: [true, false, true, false, true, false, false, true, false, true, false, false] },
         { name: "easy :(", flags: [true, false, false, true, false, true, false, true, false, false, true, false] },
@@ -12428,6 +12428,7 @@ var beepbox;
             this._tempoSlider = new Slider(input({ style: "margin: 0; width: 4em; flex-grow: 1; vertical-align: middle;", type: "range", min: "0", max: "14", value: "7", step: "1" }), this._doc, (oldValue, newValue) => new beepbox.ChangeTempo(this._doc, oldValue, Math.round(120.0 * Math.pow(2.0, (-4.0 + newValue) / 9.0))));
             this._tempoStepper = input({ style: "width: 3em; margin-left: 0.4em; vertical-align: middle;", type: "number", step: "1" });
             this._reverbSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: beepbox.Config.reverbRange - 1, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new beepbox.ChangeReverb(this._doc, oldValue, newValue));
+	    this._reverbStepper = input({ style: "width: 3em; margin-left: 0.4em; vertical-align: middle;", type: "number", step: "1" });
             this._rhythmSelect = buildOptions(select(), beepbox.Config.rhythms.map(rhythm => rhythm.name));
             this._pitchedPresetSelect = buildPresetOptions(false);
             this._drumPresetSelect = buildPresetOptions(true);
@@ -12544,7 +12545,7 @@ var beepbox;
 				div({ className: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("scale") }, "Scale: "), div({ className: "selectContainer" }, this._scaleSelect)), 
 				div({ className: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("key") }, "Key: "), div({ className: "selectContainer" }, this._keySelect)), 
 				div({ className: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("tempo") }, "Tempo: "), span({ style: "display: flex;" }, this._tempoSlider.input, this._tempoStepper)), 
-				div({ className: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("reverb") }, "Reverb: "), this._reverbSlider.input), 
+				div({ className: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("reverb") }, "Reverb: "), this._reverbSlider.input, this._reverbStepper), 
 				div({ className: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("rhythm") }, "Rhythm: "), div({ className: "selectContainer" }, this._rhythmSelect))
 			);
 			this._advancedSongSettings = div({ className: "editor-song-settings-right" }, 
@@ -12612,6 +12613,7 @@ var beepbox;
                 this._tempoSlider.updateValue(Math.max(0, Math.min(28, Math.round(4.0 + 9.0 * Math.log(this._doc.song.tempo / 120.0) / Math.LN2))));
                 this._tempoStepper.value = this._doc.song.tempo.toString();
                 this._reverbSlider.updateValue(this._doc.song.reverb);
+		this._reverbStepper.value = this._doc.song.reverb.toString();
                 setSelectedValue(this._rhythmSelect, this._doc.song.rhythm);
                 if (this._doc.song.getChannelIsNoise(this._doc.channel)) {
                     this._pitchedPresetSelect.style.display = "none";
@@ -12835,6 +12837,25 @@ var beepbox;
                         event.stopPropagation();
                 }
             };
+	    this._reverbStepperCaptureNumberKeys = (event) => {
+                switch (event.keyCode) {
+                    case 38:
+                    case 40:
+                    case 37:
+                    case 39:
+                    case 48:
+                    case 49:
+                    case 50:
+                    case 51:
+                    case 52:
+                    case 53:
+                    case 54:
+                    case 55:
+                    case 56:
+                    case 57:
+                        event.stopPropagation();
+                }
+            };
             this._whenKeyPressed = (event) => {
                 if (this.prompt) {
                     if (event.keyCode == 27) {
@@ -12935,6 +12956,9 @@ var beepbox;
             };
             this._whenSetTempo = () => {
                 this._doc.record(new beepbox.ChangeTempo(this._doc, -1, parseInt(this._tempoStepper.value) | 0));
+            };
+	    this._whenSetReverb = () => {
+                this._doc.record(new beepbox.ChangeReverb(this._doc, -1, parseInt(this._reverbStepper.value) | 0));
             };
             this._whenSetScale = () => {
                 this._doc.record(new beepbox.ChangeScale(this._doc, this._scaleSelect.selectedIndex));
@@ -13153,6 +13177,7 @@ var beepbox;
             this._editMenu.addEventListener("change", this._editMenuHandler);
             this._optionsMenu.addEventListener("change", this._optionsMenuHandler);
             this._tempoStepper.addEventListener("change", this._whenSetTempo);
+	    this._reverbStepper.addEventListener("change", this._whenSetReverb);
             this._scaleSelect.addEventListener("change", this._whenSetScale);
             this._keySelect.addEventListener("change", this._whenSetKey);
             this._rhythmSelect.addEventListener("change", this._whenSetRhythm);
@@ -13183,6 +13208,7 @@ var beepbox;
             this._spectrumEditor.container.addEventListener("mousedown", this._refocusStage);
             this._harmonicsEditor.container.addEventListener("mousedown", this._refocusStage);
             this._tempoStepper.addEventListener("keydown", this._tempoStepperCaptureNumberKeys, false);
+	    this._reverbStepper.addEventListener("keydown", this._reverbStepperCaptureNumberKeys, false);
             this.mainLayer.addEventListener("keydown", this._whenKeyPressed);
             this._promptContainer.addEventListener("click", (event) => {
                 if (event.target == this._promptContainer) {
