@@ -57,7 +57,7 @@ var beepbox;
     Config.blackKeyNameParents = [-1, 1, -1, 1, -1, 1, -1, -1, 1, -1, 1, -1];
     Config.tempoMin = 30;
     Config.tempoMax = 300;
-    Config.reverbRange = 4;
+    Config.reverbRange = 200;
     Config.detuneRange = 10;
     Config.beatsPerBarMin = 3;
     Config.beatsPerBarMax = 16;
@@ -12819,25 +12819,6 @@ var beepbox;
                 }
             };
             this._tempoStepperCaptureNumberKeys = (event) => {
-                switch (event.keyCode) {
-                    case 38:
-                    case 40:
-                    case 37:
-                    case 39:
-                    case 48:
-                    case 49:
-                    case 50:
-                    case 51:
-                    case 52:
-                    case 53:
-                    case 54:
-                    case 55:
-                    case 56:
-                    case 57:
-                        event.stopPropagation();
-                }
-            };
-	    this._reverbStepperCaptureNumberKeys = (event) => {
                 switch (event.keyCode) {
                     case 38:
                     case 40:
