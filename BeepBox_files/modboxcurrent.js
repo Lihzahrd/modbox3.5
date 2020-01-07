@@ -12428,7 +12428,7 @@ var beepbox;
             this._tempoSlider = new Slider(input({ style: "margin: 0; width: 4em; flex-grow: 1; vertical-align: middle;", type: "range", min: "0", max: "14", value: "7", step: "1" }), this._doc, (oldValue, newValue) => new beepbox.ChangeTempo(this._doc, oldValue, Math.round(120.0 * Math.pow(2.0, (-4.0 + newValue) / 9.0))));
             this._tempoStepper = input({ style: "width: 3em; margin-left: 0.2em; vertical-align: middle;", type: "number", step: "1" });
             this._reverbSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: beepbox.Config.reverbRange - 1, value: "0", step: "1" }), this._doc, (oldValue, newValue) => new beepbox.ChangeReverb(this._doc, oldValue, newValue));
-	    this._reverbStepper = input({ style: "width: 3em; margin-left: 0.4em; vertical-align: middle;", type: "number", step: "1" });
+	    this._reverbStepper = input({ style: "width: 1em; margin-left: 0.2em; vertical-align: middle;", type: "number", step: "1" });
             this._rhythmSelect = buildOptions(select(), beepbox.Config.rhythms.map(rhythm => rhythm.name));
             this._pitchedPresetSelect = buildPresetOptions(false);
             this._drumPresetSelect = buildPresetOptions(true);
