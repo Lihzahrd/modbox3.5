@@ -1389,7 +1389,6 @@ var beepbox;
 	    if (instrumentObject["pan"] != undefined) {
                 this.pan = clamp(0, beepbox.Config.panMax + 1, Math.round(beepbox.Config.panCenter + (instrumentObject["pan"] | 0) * beepbox.Config.panCenter / 100));
             }
-	    }
             else {
                 this.pan = beepbox.Config.panCenter;
             }
