@@ -12583,7 +12583,8 @@ var beepbox;
 				div({ className: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("instrumentType") }, "Type: "), div({ className: "selectContainer" }, this._pitchedPresetSelect, this._drumPresetSelect)), 
 				this._instrumentVolumeSliderRow,
 				this._customizeInstrumentButton, 
-				this._customInstrumentSettingsGroup
+				this._customInstrumentSettingsGroup,
+				this._panSliderRow
 			);
 			this._advancedInstrumentSettingsGroup = div({ className: "editor-controls" }, 
 				this._advancedInstrumentSettingsLabel,
