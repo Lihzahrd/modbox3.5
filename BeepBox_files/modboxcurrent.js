@@ -12522,7 +12522,9 @@ var beepbox;
 			this._editorControls = div({ className: "editor-controls" }, 
 				div({ style: "margin: 0px; text-align: center; color: #999;" }, beepbox.Config.versionDisplayName), 
 				div({ className: "editor-volume-controls", style: "margin-top: 1px;" }, 
-				this._playButton, div(beepbox.SVG.svg({ style: "flex-shrink: 0;", width: "2em", height: "2em", viewBox: "0 0 26 26" }, beepbox.SVG.path({ d: "M 4 16 L 4 10 L 8 10 L 13 5 L 13 21 L 8 16 z M 15 11 L 16 10 A 7.2 7.2 0 0 1 16 16 L 15 15 A 5.8 5.8 0 0 0 15 12 z M 18 8 L 19 7 A 11.5 11.5 0 0 1 19 19 L 18 18 A 10.1 10.1 0 0 0 18 8 z", fill: "#777" })), this._volumeSlider, this._volumeStepper))
+				this._playButton, div(beepbox.SVG.svg({ style: "flex-shrink: 0;", width: "2em", height: "2em", viewBox: "0 0 26 26" }, beepbox.SVG.path({ d: "M 4 16 L 4 10 L 8 10 L 13 5 L 13 21 L 8 16 z M 15 11 L 16 10 A 7.2 7.2 0 0 1 16 16 L 15 15 A 5.8 5.8 0 0 0 15 12 z M 18 8 L 19 7 A 11.5 11.5 0 0 1 19 19 L 18 18 A 10.1 10.1 0 0 0 18 8 z", fill: "#777" }))))
+				div({ style: "display: flex; flex-direction: row; justify-content: space-between;" },
+				this._volumeSlider, this._volumeStepper
 			);
 			this._editorControlsAdvanced = div({ className: "editor-controls-right" }, 
 				div({ style: "margin: 0px; text-align: center; color: #999;" }, "Advanced Settings"), 
