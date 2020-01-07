@@ -95,7 +95,7 @@ var beepbox;
         { name: "double saw", volume: 0.5, samples: centerWave([0.0, -0.2, -0.4, -0.6, -0.8, -1.0, 1.0, -0.8, -0.6, -0.4, -0.2, 1.0, 0.8, 0.6, 0.4, 0.2]) },
         { name: "double pulse", volume: 0.4, samples: centerWave([1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0]) },
         { name: "spiky", volume: 0.4, samples: centerWave([1.0, -1.0, 1.0, -1.0, 1.0, 0.0]) },
-	{ name: "atari bass", volume: 0.4, samples: centerWave([1.0, -1.0, 1.0, -1.0, 1.0, -1.0]) },
+	{ name: "atari bass", volume: 0.4, samples: centerWave([-1.0, -1.0, 1.0, -1.0, 1.0, 0.2]) },
     ]);
     Config.chipNoises = toNameMap([
         { name: "retro", volume: 0.25, basePitch: 69, pitchFilterMult: 1024.0, isSoft: false, samples: null },
