@@ -12612,7 +12612,7 @@ var beepbox;
                 setSelectedValue(this._scaleSelect, this._doc.song.scale);
                 setSelectedValue(this._keySelect, beepbox.Config.keys.length - 1 - this._doc.song.key);
                 this._tempoSlider.updateValue(Math.max(0, Math.min(28, Math.round(4.0 + 9.0 * Math.log(this._doc.song.tempo / 120.0) / Math.LN2))));
-                this._tempoStepper.updateValue(this._doc.song.tempo);
+                this._tempoStepper.value = this._doc.song.tempo.toString();
                 this._reverbSlider.updateValue(this._doc.song.reverb);
 		this._reverbStepper.value = this._doc.song.reverb.toString();
                 setSelectedValue(this._rhythmSelect, this._doc.song.rhythm);
