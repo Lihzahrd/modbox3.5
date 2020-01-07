@@ -12574,7 +12574,8 @@ var beepbox;
 			this._customAdvancedInstrumentSettingsGroup = div({ className: "editor-controls" }, 
 				this._chordSelectRow,
 				this._filterCutoffRow, 
-				this._filterResonanceRow 
+				this._filterResonanceRow,
+				this._panSliderRow
 			);
 			this._instrumentSettingsGroup = div({ className: "editor-controls" }, 
 				this._instrumentSettingsLabel,
