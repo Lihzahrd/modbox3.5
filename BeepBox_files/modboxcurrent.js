@@ -140,6 +140,8 @@ var beepbox;
     Config.effectsNames = ["none", "reverb", "chorus", "chorus & reverb"];
     Config.volumeRange = 8;
     Config.volumeLogScale = -0.5;
+    Config.panCenter = 16;
+    Config.panMax = Config.panCenter * 2;
     Config.chords = toNameMap([
         { name: "harmony", harmonizes: true, customInterval: false, arpeggiates: false, isCustomInterval: false, strumParts: 0 },
         { name: "strum", harmonizes: true, customInterval: false, arpeggiates: false, isCustomInterval: false, strumParts: 1 },
@@ -1185,6 +1187,7 @@ var beepbox;
             this.effects = 0;
             this.chord = 1;
             this.volume = 0;
+	    this.pan = beepbox.Config.panCenter;
             this.pulseWidth = beepbox.Config.pulseWidthRange - 1;
             this.pulseEnvelope = 1;
             this.algorithm = 0;
@@ -1208,6 +1211,7 @@ var beepbox;
             this.type = type;
             this.preset = type;
             this.volume = 0;
+	    this.pan = beepbox.Config.panCenter;
             switch (type) {
                 case 0:
                     this.chipWave = 2;
@@ -1292,6 +1296,7 @@ var beepbox;
             const instrumentObject = {
                 "type": beepbox.Config.instrumentTypeNames[this.type],
                 "volume": (5 - this.volume) * 20,
+		"pan": (this.pan - beepbox.Config.panCenter) * 100 / beepbox.Config.panCenter,
                 "effects": beepbox.Config.effectsNames[this.effects],
             };
             if (this.preset != this.type) {
@@ -1380,6 +1385,13 @@ var beepbox;
             }
             else {
                 this.volume = 0;
+            }
+	    if (instrumentObject["pan"] != undefined) {
+                this.pan = clamp(0, beepbox.Config.panMax + 1, Math.round(beepbox.Config.panCenter + (instrumentObject["pan"] | 0) * beepbox.Config.panCenter / 100));
+            }
+	    }
+            else {
+                this.pan = beepbox.Config.panCenter;
             }
             const oldTransitionNames = { "binary": 0, "sudden": 1, "smooth": 2 };
             const transitionObject = instrumentObject["transition"] || instrumentObject["envelope"];
@@ -1752,6 +1764,7 @@ var beepbox;
                     const instrument = this.channels[channel].instruments[i];
                     buffer.push(84, base64IntToCharCode[instrument.type]);
                     buffer.push(118, base64IntToCharCode[instrument.volume]);
+		    buffer.push(76, base64IntToCharCode[instrument.pan]);
                     buffer.push(117, base64IntToCharCode[instrument.preset >> 6], base64IntToCharCode[instrument.preset & 63]);
                     buffer.push(113, base64IntToCharCode[instrument.effects]);
                     if (instrument.type != 4) {
@@ -2363,6 +2376,10 @@ var beepbox;
                         const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
                         instrument.volume = clamp(0, beepbox.Config.volumeRange, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                     }
+                }
+		else if (command == 76) {
+                    const instrument = this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator];
+                    instrument.pan = clamp(0, beepbox.Config.panMax + 1, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
                 }
                 else if (command == 65) {
                     this.channels[instrumentChannelIterator].instruments[instrumentIndexIterator].algorithm = clamp(0, beepbox.Config.algorithms.length, base64CharCodeToInt[compressed.charCodeAt(charIndex++)]);
@@ -3700,6 +3717,25 @@ var beepbox;
             tone.intervalMult = 1.0;
             tone.intervalVolumeMult = 1.0;
             tone.active = false;
+	    const pan = (instrument.pan - beepbox.Config.panCenter) / beepbox.Config.panCenter;
+            const maxDelay = 0.00065 * synth.samplesPerSecond;
+            const delay = Math.round(-pan * maxDelay) * 2;
+            const volumeL = Math.cos((1 + pan) * Math.PI * 0.25) * 1.414;
+            const volumeR = Math.cos((1 - pan) * Math.PI * 0.25) * 1.414;
+            const delayL = Math.max(0.0, -delay);
+            const delayR = Math.max(0.0, delay);
+            if (delay >= 0) {
+                tone.stereoVolume1 = volumeL;
+                tone.stereoVolume2 = volumeR;
+                tone.stereoOffset = 0;
+                tone.stereoDelay = delayR + 1;
+            }
+            else {
+                tone.stereoVolume1 = volumeR;
+                tone.stereoVolume2 = volumeL;
+                tone.stereoOffset = 1;
+                tone.stereoDelay = delayL - 1;
+            }
             let resetPhases = true;
             let partsSinceStart = 0.0;
             let intervalStart = 0.0;
@@ -5596,6 +5632,11 @@ var beepbox;
                         message = div(h2("Instrument Volume"), p("This setting controls the volume of the selected instrument without affecting the volume of the other instruments. This allows you to balance the loudness of each instrument relative to each other."));
                     }
                     break;
+		case "pan":
+                    {
+                        message = div(h2("Instrument Panning"), p("If you're listening through headphones or some other stereo sound system, this controls the position of the instrument and where the sound is coming from, ranging from left to right."), p("As a rule of thumb, composers typically put lead melodies, drums, and basses in the center, and spread any other instruments to either side. If too many instruments seem like they're coming from the same place, it can feel crowded and harder to distinguish individual sounds, especially if they cover a similar pitch range."));
+                    }
+                    break;
                 case "instrumentType":
                     {
                         message = div(h2("Instrument Type"), p("BeepBox comes with many instrument presets. You can also create your own custom instruments, or even generate random ones!"));
@@ -6098,8 +6139,10 @@ var beepbox;
                     }
                     else if (preset.settings != undefined) {
                         const tempVolume = instrument.volume;
+			const tempPan = instrument.pan;
                         instrument.fromJsonObject(preset.settings, doc.song.getChannelIsNoise(doc.channel));
                         instrument.volume = tempVolume;
+			instrument.pan = tempPan;
                     }
                 }
                 instrument.preset = newValue;
@@ -7882,6 +7925,16 @@ var beepbox;
         }
     }
     beepbox.ChangeVolume = ChangeVolume;
+    class ChangePan extends beepbox.Change {
+        constructor(doc, oldValue, newValue) {
+            super();
+            doc.song.channels[doc.channel].instruments[doc.getCurrentInstrument()].pan = newValue;
+            doc.notifier.changed();
+            if (oldValue != newValue)
+                this._didSomething();
+        }
+    }
+    beepbox.ChangePan = ChangePan;
     class ChangeVolumeBend extends beepbox.UndoableChange {
         constructor(doc, note, bendPart, bendVolume, bendInterval) {
             super(false);
@@ -11278,6 +11331,8 @@ var beepbox;
                             writeEventTime(barStartTime);
                             let channelVolume = beepbox.volumeMultToMidiVolume(beepbox.Synth.instrumentVolumeToVolumeMult(instrument.volume));
                             writeControlEvent(7, Math.min(0x7f, Math.round(channelVolume)));
+			    let instrumentPan = (instrument.pan / beepbox.Config.panCenter - 1) * 0x3f + 0x40;
+                            writeControlEvent(10, Math.min(0x7f, Math.round(instrumentPan)));
                         }
                     }
                     if (song.getPattern(channel, 0) == null) {
@@ -11693,6 +11748,7 @@ var beepbox;
             const pitchBendRangeLSB = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
             const currentInstrumentProgram = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
             const currentInstrumentVolumes = [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100];
+	    const currentInstrumentPans = [64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64];
             const noteEvents = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []];
             const pitchBendEvents = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []];
             const expressionEvents = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []];
@@ -11720,7 +11776,7 @@ var beepbox;
                                 {
                                     const pitch = track.reader.readMidi7Bits();
                                     const velocity = track.reader.readMidi7Bits();
-                                    noteEvents[eventChannel].push({ midiTick: currentMidiTick, pitch: pitch, velocity: 0.0, program: -1, instrumentVolume: -1, on: false });
+                                    noteEvents[eventChannel].push({ midiTick: currentMidiTick, pitch: pitch, velocity: 0.0, program: -1, instrumentVolume: -1, instrumentPan: -1, on: false });
                                 }
                                 break;
                             case 144:
@@ -11728,11 +11784,12 @@ var beepbox;
                                     const pitch = track.reader.readMidi7Bits();
                                     const velocity = track.reader.readMidi7Bits();
                                     if (velocity == 0) {
-                                        noteEvents[eventChannel].push({ midiTick: currentMidiTick, pitch: pitch, velocity: 0.0, program: -1, instrumentVolume: -1, on: false });
+                                        noteEvents[eventChannel].push({ midiTick: currentMidiTick, pitch: pitch, velocity: 0.0, program: -1, instrumentVolume: -1, instrumentPan: -1, on: false });
                                     }
                                     else {
                                         const volume = Math.max(0, Math.min(beepbox.Config.volumeRange - 1, Math.round(beepbox.Synth.volumeMultToInstrumentVolume(beepbox.midiVolumeToVolumeMult(currentInstrumentVolumes[eventChannel])))));
-                                        noteEvents[eventChannel].push({ midiTick: currentMidiTick, pitch: pitch, velocity: Math.max(0.0, Math.min(1.0, (velocity + 14) / 90.0)), program: currentInstrumentProgram[eventChannel], instrumentVolume: volume, on: true });
+					const pan = Math.max(0, Math.min(beepbox.Config.panMax, Math.round(((currentInstrumentPans[eventChannel] - 64) / 63 + 1) * beepbox.Config.panCenter)));
+                                        noteEvents[eventChannel].push({ midiTick: currentMidiTick, pitch: pitch, velocity: Math.max(0.0, Math.min(1.0, (velocity + 14) / 90.0)), program: currentInstrumentProgram[eventChannel], instrumentVolume: volume, instrumentPan: pan, on: true });
                                     }
                                 }
                                 break;
@@ -11757,6 +11814,11 @@ var beepbox;
                                         case 7:
                                             {
                                                 currentInstrumentVolumes[eventChannel] = value;
+                                            }
+                                            break;
+					case 10:
+                                            {
+                                                currentInstrumentPans[eventChannel] = value;
                                             }
                                             break;
                                         case 11:
@@ -11929,6 +11991,7 @@ var beepbox;
                 let currentVelocity = 1.0;
                 let currentProgram = 0;
                 let currentInstrumentVolume = 0;
+		let currentInstrumentPan = beepbox.Config.panCenter;
                 if (isDrumsetChannel) {
                     const heldPitches = [];
                     let currentBar = -1;
@@ -11961,6 +12024,7 @@ var beepbox;
                             }
                             if (!setInstrumentVolume || instrument.volume > currentInstrumentVolume) {
                                 instrument.volume = currentInstrumentVolume;
+				instrument.pan = currentInstrumentPan;
                                 setInstrumentVolume = true;
                             }
                             const drumFreqs = [];
@@ -11994,6 +12058,7 @@ var beepbox;
                             heldPitches.push(noteEvent.pitch);
                             prevEventPart = nextEventPart;
                             currentVelocity = noteEvent.velocity;
+			    currentInstrumentPan = noteEvent.instrumentPan;
                             currentInstrumentVolume = noteEvent.instrumentVolume;
                         }
                     }
@@ -12061,12 +12126,14 @@ var beepbox;
                                                 instrument.chord = 0;
                                             }
                                             instrument.volume = currentInstrumentVolume;
+					    instrument.pan = currentInstrumentPan;
                                             channel.instruments.push(instrument);
                                         }
                                         pattern.instrument = channel.instruments.indexOf(instrumentByProgram[currentProgram]);
                                     }
                                     if (instrumentByProgram[currentProgram] != undefined) {
                                         instrumentByProgram[currentProgram].volume = Math.min(instrumentByProgram[currentProgram].volume, currentInstrumentVolume);
+					instrumentByProgram[currentProgram].pan = Math.min(instrumentByProgram[currentProgram].pan, currentInstrumentPan);
                                     }
                                     const note = new beepbox.Note(-1, noteStartPart, noteEndPart, 3, false);
                                     note.pins.length = 0;
@@ -12196,6 +12263,7 @@ var beepbox;
                             currentVelocity = noteEvent.velocity;
                             currentProgram = noteEvent.program;
                             currentInstrumentVolume = noteEvent.instrumentVolume;
+			    currentInstrumentPan = noteEvent.instrumentPan;
                         }
                         prevEventMidiTick = nextEventMidiTick;
                         prevEventPart = nextEventPart;
@@ -12439,6 +12507,8 @@ var beepbox;
             this._instrumentSelectRow = div({ className: "selectRow", style: "display: none;" }, span({ class: "tip", onclick: () => this._openPrompt("instrumentIndex") }, "Instrument: "), div({ className: "selectContainer" }, this._instrumentSelect));
             this._instrumentVolumeSlider = new Slider(input({ style: "margin: 0;", type: "range", min: -(beepbox.Config.volumeRange - 1), max: "0", value: "0", step: "1" }), this._doc, (oldValue, newValue) => new beepbox.ChangeVolume(this._doc, oldValue, -newValue));
             this._instrumentVolumeSliderRow = div({ className: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("instrumentVolume") }, "Volume: "), this._instrumentVolumeSlider.input);
+	    this._panSlider = new Slider(input({ style: "margin: 0;", type: "range", min: "0", max: beepbox.Config.panMax, value: beepbox.Config.panCenter, step: "1" }), this._doc, (oldValue, newValue) => new beepbox.ChangePan(this._doc, oldValue, newValue));
+            this._panSliderRow = div({ className: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("pan") }, "Panning: "), this._panSlider.input);
             this._chipWaveSelect = buildOptions(select(), beepbox.Config.chipWaves.map(wave => wave.name));
             this._chipNoiseSelect = buildOptions(select(), beepbox.Config.chipNoises.map(wave => wave.name));
             this._chipWaveSelectRow = div({ className: "selectRow" }, span({ class: "tip", onclick: () => this._openPrompt("chipWave") }, "Wave: "), div({ className: "selectContainer" }, this._chipWaveSelect));
@@ -12800,6 +12870,7 @@ var beepbox;
                 setSelectedValue(this._intervalSelect, instrument.interval);
                 setSelectedValue(this._chordSelect, instrument.chord);
                 this._instrumentVolumeSlider.updateValue(-instrument.volume);
+		this._panSlider.updateValue(instrument.pan);
                 setSelectedValue(this._instrumentSelect, instrumentIndex);
                 this._piano.container.style.display = this._doc.showLetters ? "" : "none";
                 this._octaveScrollBar.container.style.display = this._doc.showScrollBar ? "" : "none";
@@ -12878,6 +12949,7 @@ var beepbox;
                             const instrument = this._doc.song.channels[this._doc.channel].instruments[this._doc.getCurrentInstrument()];
                             const instrumentObject = instrument.toJsonObject();
                             delete instrumentObject["volume"];
+			    delete instrumentObject["pan"];
                             delete instrumentObject["preset"];
                             this._copyTextToClipboard(JSON.stringify(instrumentObject));
                         }
