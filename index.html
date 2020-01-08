@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8" />
-	<title>ModBox Beta</title>
+	<title>ModBox Beta 3.5</title>
 	<link rel="icon" href="favicon.ico" type="image/x-icon" />
 	<meta name="description" content="BeepBox is an online tool for sketching and sharing chiptune melodies. " />
 	<meta name="keywords" content="chiptune, music, melody, composition, tool, square wave, NES, NSF, BeepBox, beepbox" />
@@ -62,7 +62,7 @@
 			<div id="splashText"></div>
 		</h2>
 		<p id="introduction">
-			BeepBox is an online tool for sketching and sharing chiptune melodies. ModBox expands the world of BeepBox into a whole new realm! We are on the frontier of exploaration with this beta!
+			BeepBox is an online tool for sketching and sharing chiptune melodies. ModBox expands the world of BeepBox into a whole new realm! We are on the frontier of exploration with this beta!
 		</p>
 		<p>
 			All song data is packaged into the URL at the top of your browser. When you make changes to the song, the URL is updated
@@ -312,6 +312,12 @@ Instead of loading js beepbox editor interface directly, test for browser suppor
 					break;
 				case 30:
 					document.getElementById("splashText").innerHTML = "  Sodium free!";
+					break;
+				case 31:
+					document.getElementById("splashText").innerHTML = "  Now with Lihzahrds";
+					break;
+				case 32:
+					document.getElementById("splashText").innerHTML = "  Also try Widebox!";
 					break;
 			}
 		}
